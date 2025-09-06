@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" href="/icon.png" type="image/png">  
+  <title id="page"></title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <style>
+  /* ===== Cosmic Background ===== */
+  .cosmic-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a1a3d 0%, #000 70%);
+  }
+
+  .stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    perspective: 1000px;
+  }
+
+  .star {
+    position: absolute;
+    background: linear-gradient(45deg, #fff, #a5b4fc);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(165, 180, 252, 0.8);
+    animation: orbit var(--duration) linear infinite;
+  }
+
+  @keyframes orbit {
+    0% { transform: translateZ(0) rotate(0deg) translateX(var(--radius)) rotate(0deg); }
+    100% { transform: translateZ(0) rotate(360deg) translateX(var(--radius)) rotate(-360deg); }
+  }
+
+  .cosmic-line {
+    position: absolute;
+    background: linear-gradient(90deg, rgba(129, 140, 248, 0.3), transparent);
+    height: 1px;
+    transform-origin: left center;
+    animation: cosmic-sweep var(--duration) linear infinite;
+  }
+
+  @keyframes cosmic-sweep {
+    0% { transform: scaleX(0); opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { transform: scaleX(1); opacity: 0; }
+  }
+
+  /* ===== Loading Screen Styles ===== */
+  #loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 1s ease;
+  }
+  
+  .loading-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-spinner-large {
+    border: 6px solid rgba(129, 140, 248, 0.2);
+    border-top: 6px solid var(--primary-light);
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    animation: spin 1.2s linear infinite;
+    margin-bottom: 25px;
+    position: relative;
+  }
+
+  .loading-spinner-large::after {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    right: -12px;
+    bottom: -12px;
+    border: 4px solid rgba(99, 102, 241, 0.3);
+    border-radius: 50%;
+    animation: spin 2.5s linear infinite reverse;
+  }
+  
+  .loading-text {
+    color: white;
+    font-size: 2rem;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(90deg, #6366f1, #a5b4fc, #f472b6, #a5b4fc, #6366f1);
+    background-size: 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: neonGlow 6s ease infinite, glitch 2s infinite;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.8), 0 0 20px rgba(244, 114, 182, 0.5);
+  }
+
+  @keyframes neonGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(2px, -2px); }
+    60% { transform: translate(-2px, 0); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0); }
+  }
+
+  .loading-progress {
+    width: 250px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin-top: 20px;
+    overflow: hidden;
+  }
+
+  .loading-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #6366f1, #f472b6);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  }
+
+  :root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --secondary: #f472b6;
+    --dark: #0a0a1a;
+    --darker: #050510;
+    --light: #f8fafc;
+    --gray: #94a3b8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --card-bg: rgba(20, 20, 50, 0.85);
+    --card-hover: rgba(30, 30, 70, 0.9);
+    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--darker);
+    color: var(--light);
+    padding: 1.5rem;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .d-none {
+    display: none !important;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--light);
+    padding: 1.2rem;
+    border-radius: 10px;
+    max-height: 400px;
+    font-size: 0.9rem;
+    font-family: 'Consolas', monospace;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  /* ===== Navbar Styles ===== */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    color: var(--primary-light);
+    font-size: 2rem;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-link {
+    color: var(--light);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+  }
+
+  .nav-link:hover {
+    color: var(--primary-light);
+    background: rgba(129, 140, 248, 0.1);
+  }
+
+  .nav-link i {
+    font-size: 0.9rem;
+  }
+
+  .dropdown {
+    position: relative;
+  }
+
+  .dropdown-toggle::after {
+    content: '\f078';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 0.7rem;
+    margin-left: 5px;
+    transition: transform 0.3s ease;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 10px;
+    padding: 0.8rem 0;
+    min-width: 200px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 0.6rem 1.2rem;
+    color: var(--light);
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: 0.95rem;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(129, 140, 248, 0.2);
+    color: var(--primary-light);
+    padding-left: 1.4rem;
+  }
+
+  .dropdown-divider {
+    height: 1px;
+    background: rgba(99, 102, 241, 0.2);
+    margin: 0.5rem 0;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  /* ===== Form Styles ===== */
+  .modal-body form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--light);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .modal-body form input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: rgba(20, 20, 50, 0.7);
+    color: var(--light);
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+    backdrop-filter: blur(8px);
+  }
+
+  .modal-body form input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .modal-body form input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    background: rgba(20, 20, 50, 0.9);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.4);
+  }
+
+  #submitParamBtn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 1rem;
+    border-radius: 10px;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    width: 100%;
+    margin-top: 0.8rem;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #submitParamBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.6s ease;
+  }
+
+  #submitParamBtn:hover {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+  }
+
+  #submitParamBtn:hover::before {
+    left: 100%;
+  }
+
+  .loading-spinner {
+    margin: 1.5rem auto;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid var(--secondary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ===== Modal Styles ===== */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-dialog {
+    width: 100%;
+    max-width: 550px;
+    background: rgba(20, 20, 50, 0.95);
+    border-radius: 15px;
+    padding: 2rem;
+    color: var(--light);
+    overflow: hidden;
+    transform: translateY(30px);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    backdrop-filter: blur(12px);
+  }
+
+  .modal.active .modal-dialog {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-header h5 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    background: linear-gradient(90deg, #a5b4fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  }
+
+  .modal-header span {
+    font-size: 0.95rem;
+    color: var(--gray);
+    display: block;
+    margin-top: 6px;
+    font-weight: 400;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--gray);
+    transition: var(--transition);
+    padding: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .btn-close:hover {
+    color: var(--secondary);
+    background: rgba(244, 114, 182, 0.2);
+  }
+
+  /* ===== Modal Body Content ===== */
+  .modal-body {
+    padding: 0.8rem 0;
+  }
+
+  .copy-section {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(20, 20, 50, 0.7);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+    overflow: auto;
+    transition: var(--transition);
+  }
+
+  .copy-section.active {
+    display: flex;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .copy-button {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .copy-button:hover {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  #apiResponseContent {
+    background: rgba(20, 20, 50, 0.7);
+    padding: 1.2rem;
+    border-radius: 10px;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    font-size: 0.95rem;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    transition: var(--transition);
+  }
+
+  /* ===== Page Sections ===== */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .container.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .hero {
+    text-align: left;
+    margin: 3rem 0 4rem;
+    max-width: 800px;
+  }
+
+  .hero h2 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(90deg, #a5b4fc, #f472b6, #6366f1, #f472b6, #a5b4fc);
+    background-size: 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+    animation: neonGlow 8s ease infinite;
+    line-height: 1.2;
+    text-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+    max-width: 650px;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ===== Stats ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stats div {
+    background: var(--card-bg);
+    padding: 2rem 1.2rem;
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .stats div:hover {
+    transform: translateY(-8px);
+    background: var(--card-hover);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+    border-color: rgba(244, 114, 182, 0.4);
+  }
+
+  .stats h3 {
+    font-size: 1rem;
+    opacity: 0.9;
+    color: var(--gray);
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+  }
+
+  .stats p {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .content h2 {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  /* ===== Tabs ===== */
+  .tabs {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    margin-bottom: 2.5rem;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    background: none;
+    color: var(--gray);
+    border: none;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    border-bottom: 3px solid transparent;
+    padding: 0.8rem 0;
+    cursor: pointer;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    transition: var(--transition);
+    position: relative;
+  }
+
+  .tab.active {
+    color: white;
+    border-color: var(--secondary);
+  }
+
+  .tab:after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--secondary);
+    transition: var(--transition);
+  }
+
+  .tab:hover:not(.active):after {
+    width: 100%;
+  }
+
+  /* ===== API Cards ===== */
+  .api-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 5rem;
+  }
+
+  .api-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+    transition: var(--transition);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .api-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.2), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .api-card:hover::before {
+    opacity: 1;
+  }
+
+  .api-card:hover {
+    transform: translateY(-10px) rotate(2deg);
+    background: var(--card-hover);
+    box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(244, 114, 182, 0.5);
+  }
+
+  .api-info h3 {
+    font-size: 1.4rem;
+    color: white;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    margin-bottom: 0.8rem;
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(90deg, #a5b4fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  }
+
+  .api-info p {
+    font-size: 1rem;
+    color: var(--light);
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+
+  .status {
+    background: rgba(16, 185, 129, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--success);
+    display: inline-block;
+    font-weight: 600;
+    margin-top: 0.8rem;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+  }
+
+  .status.warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+  }
+
+  .status.danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+  }
+
+  .play-button {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    transition: var(--transition);
+    align-self: flex-start;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .play-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: all 0.6s ease;
+  }
+
+  .play-button:hover {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(244, 114, 182, 0.6);
+  }
+
+  .play-button:hover::before {
+    left: 100%;
+  }
+
+  /* ===== Download Buttons ===== */
+  .download-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .download-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  }
+
+  .download-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+  }
+
+  .download-btn.audio {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  }
+
+  .download-btn.audio:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 2.5rem 0 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
+    margin-top: 4rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+  }
+
+  .footer.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .contact {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .contact a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 1.5rem;
+    transition: var(--transition);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact a:hover {
+    color: white;
+    background: var(--secondary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(244, 114, 182, 0.4);
+  }
+
+  /* ===== Animations ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    body {
+      padding: 1rem;
+    }
+    
+    .hero h2 {
+      font-size: 2.5rem;
+    }
+    
+    .hero p {
+      font-size: 1.1rem;
+    }
+    
+    .api-list {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Mobile Nav */
+    .nav-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 300px;
+      height: 100vh;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      flex-direction: column;
+      padding: 2rem;
+      transition: right 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .nav-links.active {
+      right: 0;
+    }
+
+    .mobile-menu-btn {
+      display: block;
+      z-index: 1001;
+    }
+
+    .dropdown-menu {
+      position: static;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+      display: none;
+      padding-left: 1rem;
+    }
+
+    .dropdown.active .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-toggle::after {
+      transform: rotate(90deg);
+    }
+
+    .dropdown.active .dropdown-toggle::after {
+      transform: rotate(-90deg);
+    }
+
+    .download-buttons {
+      flex-direction: column;
+    }
+
+    .download-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero h2 {
+      font-size: 2rem;
+    }
+    
+    .stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .modal-dialog {
+      padding: 1.5rem;
+    }
+    
+    .loading-spinner-large {
+      width: 70px;
+      height: 70px;
+    }
+    
+    .loading-text {
+      font-size: 1.5rem;
+    }
+  }
+  </style>
+</head>
+<body>
+  <!-- Cosmic Background -->
+  <div class="cosmic-background">
+    <div class="stars" id="stars"></div>
+    <div id="cosmic-lines"></div>
+  </div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-container">
+      <div class="loading-spinner-large"></div>
+      <div class="loading-text">Aqilll OfficiaL</div>
+      <div class="loading-progress">
+        <div class="loading-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="#" class="logo">
+      <i class="fas fa-rocket logo-icon"></i>
+      <span>Qiltech API</span>
+    </a>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="nav-links" id="navLinks">
+      <a href="https://portofolioxaqil.vercel.app/" class="nav-link">
+        <i class="fas fa-home"></i> Portofolio
+      </a>
+      
+      <div class="dropdown nav-item">
+        <a href="/dokumentasi" class="nav-link dropdown-toggle">
+          <i class="fas fa-code"></i> Dokumentasi
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item" data-tab="orderkuota">
+            <i class="fas fa-shopping-cart"></i> Order Kuota
+          </a>
+          <a href="#" class="dropdown-item" data-tab="Downloader">
+            <i class="fas fa-download"></i> Downloader
+          </a>
+          <a href="#" class="dropdown-item" data-tab="Tools">
+            <i class="fas fa-tools"></i> Tools
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="/api-orderkuota" class="dropdown-item">
+            <i class="fas fa-book"></i> Documentation Api createorkutnew
+          </a>
+        <div class="dropdown-divider"></div>
+        <a href="/api-orkutnew" class="dropdown-item">
+          <i class="fas fa-book"></i> Documentation Api Orkut New
+        </a>
+      </div>
+      </div>
+      </div>
+      
+      <div class="dropdown nav-item">
+        <a href="#" class="nav-link dropdown-toggle">
+          <i class="fas fa-user"></i> Account
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-key"></i> API Key
+          </a>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-chart-line"></i> Usage Stats
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </div>
+      
+      <div class="dropdown nav-item">
+        <a href="#" class="nav-link dropdown-toggle">
+          <i class="fas fa-address-book"></i> Contact
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://wa.me/62895405753446" target="_blank" class="dropdown-item">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+          </a>
+          <a href="https://github.com/Fahrihosting1" target="_blank" class="dropdown-item">
+            <i class="fab fa-github"></i> GitHub
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope"></i> Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="hero fade-in">
+      <h2 id="apiTitle"></h2>
+      <p>Explore a universe of APIs designed for seamless integration. Connect, create, and innovate with cutting-edge endpoints.</p>
+    </section>
+
+    <section class="content">
+      <div class="tabs" id="tabs"></div>
+      <div id="api-list" class="api-list"></div>
+    </section>
+  </div>
+
+  <!-- Modal for API Response -->
+  <div class="modal" id="apiResponseModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h5></h5>
+          <span></span>
+        </div>
+        <button id="btn-close" class="btn-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="copy-section">
+          <span id="copyEndpointText"></span>
+          <button class="copy-button">
+            <i class="far fa-copy"></i>
+          </button>
+        </div>
+        <form id="paramForm" style="margin-bottom: 0.5rem"></form>
+        <button id="submitParamBtn" type="button" onclick="submitParams()">Submit Request</button>
+        <div id="apiResponseLoading" class="loading-spinner" style="display: none;"></div>
+        <pre id="apiResponseContent" class="d-none"></pre>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div id="credits"></div>
+    <div class="contact">
+      <a id="githubLink" target="_blank" title="GitHub">
+        <i class="fab fa-github"></i>
+      </a>
+      <a id="whatsappLink" target="_blank" title="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+      <a id="youtubeLink" target="_blank" title="YouTube">
+        <i class="fab fa-youtube"></i>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+// Embedded settings (replacing settings.json)
+const settings = {
+  creator: "Aqilll - OfficiaL",
+  whatsapp: "https://wa.me/62895405753446",
+  github: "https://github/Fahrihosting1",
+  youtube: "",
+  apititle: "Aqilll - OfficiaL",
+  pagetitle: "Aqilll - OfficiaL",
+  apikey: ["p"],
+  endpoints: {
+    orderkuota: [
+      {
+        name: "Create Payment",
+        desc: "Create qris payment",
+        status: "Active",
+        path: "/api/orkut/createpayment?apikey=&amount=&codeqr="
+      },
+      {
+        name: "Cek Status",
+        desc: "Cek status payment",
+        status: "Active",
+        path: "/api/orkut/cekstatus?apikey=&merchant=&keyorkut="
+      },
+      {
+        name: "Create Payment And Cek Status",
+        desc: "Create Payment and cek status",
+        status: "Active",
+        path: "/api/orkut/createorkutnew?apikey=&amount=&codeqr=&merchant=&keyorkut"
+      }
+    ],
+    Downloader: [
+      {
+        name: "Tiktok",
+        desc: "Download video And Audio from Tiktok",
+        status: "Active",
+        path: "/api/downloader/tiktok?url=",
+        type: "tiktok"
+      },
+      {
+        name: "Instagram",
+        desc: "Download Vidio Instagram",
+        status: "Active",
+        path: "/api/downloader/ig?url="
+      },
+      {
+        name: "Facebook",
+        desc: "Download Vidio Facebook",
+        status: "Active",
+        path: "/api/downloader/facebook?url="
+      },
+      {
+        name: "Mediafire",
+        desc: "Download File Mediafire",
+        status: "Active",
+        path: "/api/downloader/mediafire?url="
+      }
+    ],
+    Tools: [
+      {
+        name: "Delete Users Pterodactyl",
+        desc: "Delete Users Pterodactyl",
+        status: "Active",
+        path: "/cleanup-users?plta=&domain="
+      },
+      {
+        name: "Delete Servers Pterodactyl",
+        desc: "Delete Servers Pterodactyl",
+        status: "Active",
+        path: "/servers?plta=&domain="
+      }
+    ],
+  }
+};
+
+// TikTok Downloader API integration using BOTCAHX API
+async function fetchTikTokDownloader(url) {
+  try {
+    // Using the BOTCAHX TikTok API endpoint format
+    const apiEndpoint = `/tiktok/api.php?url=${encodeURIComponent(url)}`;
+    const response = await fetch(apiEndpoint);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('TikTok API Error:', error);
+    throw error;
+  }
+}
+
+function renderTikTokResponse(data) {
+  const responseEl = document.getElementById("apiResponseContent");
+  
+  if (data.video && data.video.length > 0) {
+    let content = `<strong>✅ TikTok Download Success!</strong>\n\n`;
+    content += `<strong>📱 Video URL:</strong>\n${data.video[0]}\n\n`;
+    
+    if (data.audio && data.audio.length > 0) {
+      content += `<strong>🎵 Audio URL:</strong>\n${data.audio[0]}\n\n`;
+    }
+    
+    // Add download buttons
+    content += `<div class="download-buttons">`;
+    content += `<a href="${data.video[0]}" target="_blank" class="download-btn">
+                  <i class="fas fa-video"></i> Download Video
+                </a>`;
+    
+    if (data.audio && data.audio.length > 0) {
+      content += `<a href="${data.audio[0]}" target="_blank" class="download-btn audio">
+                    <i class="fas fa-music"></i> Download Audio
+                  </a>`;
+    }
+    content += `</div>`;
+    
+    responseEl.innerHTML = content;
+  } else {
+    responseEl.textContent = "❌ Error: Unable to fetch TikTok video data. Please check the URL and try again.";
+  }
+}
+
+// Create cosmic background elements
+function createCosmicBackground() {
+  const starsContainer = document.getElementById('stars');
+  const linesContainer = document.getElementById('cosmic-lines');
+
+  // Create orbiting stars
+  for (let i = 0; i < 150; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 4 + 2;
+    star.style.width = `${size}px`;
+    star.style.height = `${size}px`;
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.top = `${Math.random() * 100}%`;
+    star.style.setProperty('--radius', `${Math.random() * 50 + 20}px`);
+    star.style.setProperty('--duration', `${Math.random() * 20 + 10}s`);
+    star.style.opacity = Math.random() * 0.7 + 0.3;
+    starsContainer.appendChild(star);
+  }
+
+  // Create cosmic lines
+  for (let i = 0; i < 15; i++) {
+    const line = document.createElement('div');
+    line.className = 'cosmic-line';
+    line.style.left = `${Math.random() * 100}%`;
+    line.style.top = `${Math.random() * 100}%`;
+    line.style.width = `${Math.random() * 300 + 150}px`;
+    line.style.setProperty('--duration', `${Math.random() * 8 + 4}s`);
+    line.style.transform = `rotate(${Math.random() * 360}deg)`;
+    linesContainer.appendChild(line);
+  }
+}
+
+// Mobile menu toggle
+function setupMobileMenu() {
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+  const dropdowns = document.querySelectorAll('.dropdown');
+
+  mobileMenuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    mobileMenuBtn.innerHTML = navLinks.classList.contains('active') 
+      ? '<i class="fas fa-times"></i>' 
+      : '<i class="fas fa-bars"></i>';
+  });
+
+  dropdowns.forEach(dropdown => {
+    const toggle = dropdown.querySelector('.dropdown-toggle');
+    
+    toggle.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        dropdown.classList.toggle('active');
+      }
+    });
+  });
+}
+
+// Show loading screen initially
+document.addEventListener('DOMContentLoaded', function () {
+  createCosmicBackground();
+  setupMobileMenu();
+
+  document.querySelector('.container').style.display = 'none';
+  document.querySelector('footer').style.display = 'none';
+
+  const progressBar = document.querySelector('.loading-progress-bar');
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress > 100) progress = 100;
+    progressBar.style.width = `${progress}%`;
+  }, 150);
+
+  loadSettings().then(() => {
+    setTimeout(() => {
+      clearInterval(progressInterval);
+      progressBar.style.width = '100%';
+
+      setTimeout(() => {
+        document.getElementById('loading-screen').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('loading-screen').style.display = 'none';
+          document.querySelector('.container').style.display = 'block';
+          document.querySelector('footer').style.display = 'block';
+
+          setTimeout(() => {
+            document.querySelector('.container').classList.add('show');
+            document.querySelector('footer').classList.add('show');
+          }, 100);
+        }, 600);
+      }, 400);
+    }, 1200);
+  });
+});
+
+async function loadSettings() {
+  const tabsContainer = document.getElementById("tabs");
+  const apiList = document.getElementById("api-list");
+  let currentEndpoint = "";
+  let currentApiType = "";
+
+  // Use the embedded settings object directly
+  const apis = settings.endpoints;
+
+  const setContent = (id, property, value) => {
+    const el = document.getElementById(id);
+    if (el) el[property] = value;
+  };
+
+  setContent("page", "textContent", settings.pagetitle || "Fahri OfficiaL");
+  setContent("credits", "textContent", `© ${new Date().getFullYear()} Aqilll OfficiaL | Powered by ${settings.creator || ""}`);
+  setContent("apiTitle", "textContent", settings.apititle || "Fahri OfficiaL API Services");
+
+  document.getElementById("githubLink").href = settings.github || "#";
+  document.getElementById("whatsappLink").href = settings.whatsapp || "#";
+  document.getElementById("youtubeLink").href = settings.youtube || "#";
+
+  Object.keys(apis).forEach((key, index) => {
+    const button = document.createElement("button");
+    button.className = `tab ${index === 0 ? "active" : ""}`;
+    button.dataset.tab = key;
+    button.innerText = key.charAt(0).toUpperCase() + key.slice(1);
+    button.style.animationDelay = `${index * 0.15}s`;
+    tabsContainer.appendChild(button);
+  });
+
+  function renderAPIs(category) {
+    apiList.innerHTML = "";
+    apis[category].forEach((api, i) => {
+      const card = document.createElement("div");
+      card.className = "api-card fade-in";
+      card.style.animationDelay = `${i * 0.15}s`;
+
+      let statusClass = "";
+      if (api.status.toLowerCase().includes("maintenance")) statusClass = "danger";
+      else if (api.status.toLowerCase().includes("beta")) statusClass = "warning";
+      else statusClass = "";
+
+      card.innerHTML = `
+        <div class="api-info">
+          <h3>${api.name}</h3>
+          <p>${api.desc}</p>
+          <span class="status ${statusClass}">${api.status}</span>
+        </div>
+        <button class="play-button" data-endpoint="${api.path}" data-api="${api.name}" data-desc="${api.desc}" data-type="${api.type || ''}">
+          <i class="fa-solid fa-play"></i> Try it now
+        </button>
+      `;
+      apiList.appendChild(card);
+    });
+  }
+
+  renderAPIs(Object.keys(apis)[0]);
+
+  // Handle tab switching from both tabs and dropdown menu
+  function switchTab(tabName) {
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+    document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add("active");
+    renderAPIs(tabName);
+  }
+
+  tabsContainer.addEventListener("click", (e) => {
+    if (e.target.classList.contains("tab")) {
+      switchTab(e.target.dataset.tab);
+    }
+  });
+
+  // Handle dropdown menu items click
+  document.querySelectorAll(".dropdown-item[data-tab]").forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.preventDefault();
+      switchTab(item.dataset.tab);
+      // Close mobile menu if open
+      if (window.innerWidth <= 768) {
+        document.getElementById('navLinks').classList.remove('active');
+        document.getElementById('mobileMenuBtn').innerHTML = '<i class="fas fa-bars"></i>';
+      }
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".play-button")) {
+      const btn = e.target.closest(".play-button");
+      const endpoint = btn.getAttribute("data-endpoint");
+      const api = btn.getAttribute("data-api");
+      const desc = btn.getAttribute("data-desc");
+      const type = btn.getAttribute("data-type");
+
+      const paramForm = document.getElementById("paramForm");
+      const submitBtn = document.getElementById("submitParamBtn");
+      const modal = document.getElementById("apiResponseModal");
+
+      document.getElementById("apiResponseContent").textContent = "";
+      document.getElementById("apiResponseContent").classList.add("d-none");
+      document.getElementById("apiResponseLoading").style.display = "none";
+
+      currentEndpoint = endpoint;
+      currentApiType = type;
+      paramForm.innerHTML = "";
+      submitBtn.style.display = "none";
+
+      document.querySelector(".modal-dialog h5").innerText = api;
+      document.querySelector(".modal-dialog span").innerText = desc;
+
+      if (endpoint.includes("?")) {
+        const queryParams = endpoint.split("?")[1].split("&");
+
+        queryParams.forEach(param => {
+          const [key, value] = param.split("=");
+          paramForm.innerHTML += `
+            <label for="${key}">${key.charAt(0).toUpperCase() + key.slice(1)}</label>
+            <input type="text" id="${key}" name="${key}" value="${value || ""}" 
+                   placeholder="Enter ${key}..." required />
+          `;
+        });
+
+        submitBtn.style.display = "block";
+        modal.classList.add("active");
+        document.querySelector(".copy-section").classList.add("active");
+        document.getElementById("copyEndpointText").innerText = window.location.origin + endpoint;
+      } else {
+        fetchAPI(endpoint);
+      }
+    }
+
+    if (e.target.closest(".copy-button")) {
+      const textToCopy = document.getElementById("copyEndpointText").innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const copyBtn = e.target.closest(".copy-button");
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+          copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+        }, 2000);
+      });
+    }
+
+    if (e.target.closest("#btn-close") || e.target === document.getElementById("apiResponseModal")) {
+      const modal = document.getElementById("apiResponseModal");
+      modal.classList.remove("active");
+      document.getElementById("apiResponseContent").classList.add("d-none");
+      document.getElementById("apiResponseContent").textContent = "";
+      document.getElementById("paramForm").style.display = "block";
+      document.getElementById("submitParamBtn").style.display = "none";
+      document.querySelector(".copy-section").classList.remove("active");
+    }
+  });
+
+  document.getElementById("submitParamBtn").addEventListener("click", () => {
+    const form = document.getElementById("paramForm");
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    form.style.display = "none";
+    document.getElementById("apiResponseLoading").style.display = "block";
+
+    let endpoint = currentEndpoint.split("?")[0] + "?";
+    const inputs = form.querySelectorAll("input");
+
+    inputs.forEach((input, index) => {
+      endpoint += `${input.name}=${encodeURIComponent(input.value)}`;
+      if (index < inputs.length - 1) endpoint += "&";
+    });
+
+    fetchAPI(endpoint, currentApiType);
+  });
+}
+
+function fetchAPI(endpoint, apiType = "") {
+  const fullURL = window.location.origin + endpoint;
+  const responseEl = document.getElementById("apiResponseContent");
+  const loadingEl = document.getElementById("apiResponseLoading");
+  const urlsSection = document.querySelector(".copy-section");
+  const modal = document.getElementById("apiResponseModal");
+
+  modal.classList.add("active");
+  loadingEl.style.display = "block";
+  responseEl.classList.add("d-none");
+  responseEl.innerHTML = "";
+  urlsSection.classList.add("active");
+  document.getElementById("copyEndpointText").innerText = fullURL;
+
+  // Special handling for TikTok API
+  if (apiType === "tiktok") {
+    const urlParam = endpoint.split("url=")[1];
+    if (urlParam) {
+      const decodedUrl = decodeURIComponent(urlParam);
+      
+      fetchTikTokDownloader(decodedUrl)
+        .then(data => {
+          loadingEl.style.display = "none";
+          renderTikTokResponse(data);
+          responseEl.classList.remove("d-none");
+        })
+        .catch(err => {
+          loadingEl.style.display = "none";
+          responseEl.classList.remove("d-none");
+          responseEl.textContent = "❌ Error: " + err.message + "\n\nPlease make sure you have the TikTok downloader API server running on your backend.";
+        });
+      return;
+    }
+  }
+
+  // Default API fetch for other endpoints
+  fetch(fullURL)
+    .then(async res => {
+      loadingEl.style.display = "none";
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        responseEl.textContent = JSON.stringify(data, null, 2);
+      } else if (contentType && contentType.startsWith("image/")) {
+        const blob = await res.blob();
+        const imgUrl = URL.createObjectURL(blob);
+        responseEl.innerHTML = `<img src="${imgUrl}" alt="API Response" style="max-width: 100%; max-height: 300px; border-radius: 4px;" />`;
+      } else {
+        const text = await res.text();
+        responseEl.textContent = text.substring(0, 1000);
+      }
+
+      responseEl.classList.remove("d-none");
+    })
+    .catch(err => {
+      loadingEl.style.display = "none";
+      responseEl.classList.remove("d-none");
+      responseEl.textContent = "Error: " + err.message;
+    });
+}
+
+function submitParams() {
+  document.getElementById("submitParamBtn").click();
+}
+  </script>
+</body>
+</html>
